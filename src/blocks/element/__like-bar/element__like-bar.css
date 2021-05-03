@@ -1,0 +1,10 @@
+.element__like-bar {
+    background-color: #ffffff;
+    min-height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 0 22px;
+    
+}

@@ -1,0 +1,13 @@
+.element__item {
+    height: 295px;
+    display: block;
+    min-width: 282px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 660px) {
+    .element__item {
+        width: 282px;
+        min-height: 282px;
+    }
+}
