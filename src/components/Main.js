@@ -46,7 +46,7 @@ function Main(props) {
             <section className="photo-grid">
                 <ul className="elements">
                 <template id="post-template"/>
-                {cards.map((item) => <Card card={item} key={item._id} onCardClick={props.onCardClick}/> )}
+                {cards.map((item) => (<Card card={item} key={item._id} onCardClick={props.onCardClick}/>) )}
                 </ul>
             </section>
         </main>

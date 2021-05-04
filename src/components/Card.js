@@ -8,9 +8,9 @@ function Card(props) {
 
     return(
         
-        <li className="element" key={props.card._id}>
+        <li className="element" owner={props.card._id}>
             <button className="element__button-delete" type="button"></button>
-            <img src={props.card.link} className="element__item element__item_image" alt="#" onClick={handleClick} />
+            <img src={props.card.link} className="element__item element__item_image" alt={props.card.name} onClick={handleClick} />
                 <div className="element__like-bar">
                     <h3 className="element__description element__description_input">{props.card.name}</h3>
                         <div className="element__like-counter">
