@@ -24,7 +24,6 @@ function Main({cards, onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCa
             </section>
             <section className="photo-grid">
                 <ul className="elements">
-                    <template id="post-template"/>
                     {cards.map((item) => 
                         (< Card 
                             key={item._id} 

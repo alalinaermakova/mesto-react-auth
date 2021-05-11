@@ -1,13 +1,3 @@
-export const validationConfig = {
-    formSelector: '.pop-up__form',
-    inputSelector: '.pop-up__input',
-    submitButtonSelector: '.pop-up__button-submit',
-    inactiveButtonClass: 'pop-up__button-submit_disabled',
-    inputErrorClass: 'pop-up__input_error',
-    errorClass: 'pop-up__error-visible'
- };
- 
-
 export const nameField = '.profile__name';
 export const descriptionField = '.profile__description';
 export const newAvatarField = '.profile__img';

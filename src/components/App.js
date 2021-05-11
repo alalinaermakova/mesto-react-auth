@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -16,22 +15,12 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
-  const [cards, setCards] = React.useState([]);
-  const [currentUser, setCurrentUser] = React.useState({
+  const [cards, setCards] = useState([]);
+  const [currentUser, setCurrentUser] = useState({
     avatar: '',
-    name: 'Жак Ив-Кусто',
-    about: 'Исследователь океана'
+    name: '',
+    about: ''
   })
-
-  React.useEffect(() => {
-    api.getInfo()
-    .then((data) => {
-      setCurrentUser(data)
-    })
-    .catch((err) => {
-      console.log(err)
-      })
-    }, [])
 
   function handleEditAvatarClick () {
     setIsEditAvatarPopupOpen(true);
@@ -87,9 +76,7 @@ function App() {
     
     function updateCards(newCard) {
 
-      const newCards = cards.map((c) => (c._id === card._id ? newCard : c))
-
-      setCards(newCards)
+      setCards((cards) => cards.map((c) => (c._id === card._id ? newCard : c)))
   }
       if (isLiked) {
         api.removeLike(card._id)
@@ -115,14 +102,13 @@ function App() {
     if (isOwn) {
       api.deleteYourCard(card._id)
       .then(() => {
-        const newCards = cards.filter((c) => {
+        setCards((cards) => cards.filter((c) => {
           if (c._id === card._id) {
-            return false 
+            return false
           } else {
             return true
           }
-        })
-        setCards(newCards)
+        }))
       })
       .catch((err) => {
         console.log(err)
