@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-import ImagePopup from './ImagePopup';
-import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import api from '../utils/api';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import ImagePopup from './ImagePopup';
+import {api, authApi} from '../utils/api';
+
+import Login from './Login';
+import Register from './Register';
+import InfoToolTip from './InfoToolTip';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
 
@@ -21,6 +28,18 @@ function App() {
     name: '',
     about: ''
   })
+
+  const history = useHistory();
+
+  const [loggedIn, setLoggedIn] = React.useState(true);
+  const [email, setEmail] = React.useState('');
+  const [isToolTipOpen, setIsToolTipOpen] = React.useState(false);
+  const [toolTipResult, setToolTipResult] = React.useState(false);
+
+  function handleToolTipOpen(result) {
+    setIsToolTipOpen(true)
+    setToolTipResult(result)
+  }
 
   function handleEditAvatarClick () {
     setIsEditAvatarPopupOpen(true);
@@ -46,7 +65,8 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    setSelectedCard({isOpen: false})
+    setSelectedCard({isOpen: false});
+    setIsToolTipOpen(false);
   }
 
   function handleUpdateUser(data) {
@@ -129,6 +149,58 @@ function App() {
     })
   }
 
+  function onSignUp(data){
+    authApi.signUp(data)
+    .then(() => {
+      handleToolTipOpen(true)
+      history.push('./login')
+    })
+    .catch((err) => {
+      handleToolTipOpen(false)
+      console.log(`Не получилось зарегистрироваться: ${err}`)
+    })
+  }
+
+  function onSignIn(data){
+    authApi.signIn(data)
+    .then((res) => {
+      console.log(res)
+      localStorage.setItem('token', res.token)
+      setLoggedIn(true)
+      setEmail(data.email)
+    })
+    .then(() => {
+      history.push('./main')
+    })
+    .catch((err) => {
+      handleToolTipOpen(false)
+      console.log(`Не получилось войти: ${err}`)
+    })
+  }
+
+  function onSignOut(){
+    setLoggedIn(false)
+    localStorage.removeItem('token')
+    history.push('./login')
+  }
+
+  React.useEffect(() => {
+    if(localStorage.getItem('token')) {
+      console.log(localStorage.getItem('token'))
+      authApi.isAuthorized()
+      .then((data) => {
+        console.log(data.email)
+        setEmail(data.email)
+        setLoggedIn(true)
+        history.push('./main')
+      })
+      .catch((err) => {
+        setLoggedIn(false)
+        console.log(`Не получилось ${err}`)
+      })
+    }
+  }, [])
+
   React.useEffect(() => {
     const promises = [api.getInfo(), api.getCards()];
 
@@ -144,38 +216,70 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-    <div className="App">
-      <div className="theme theme_dark">
-        <Header />
-        <Main
-          onEditProfile= {handleEditProfileClick}
-          onAddPlace = {handleAddPlaceClick}
-          onEditAvatar = {handleEditAvatarClick}
-          cards={cards}
-          onCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleDeleteCard}
+    <div className="theme theme_dark">
+      <Header
+      email={email}
+      loggedIn={loggedIn}
+      onSignOut={onSignOut}
+       />
+    <Switch>
+    <Route path="/login">
+            <Login onSignIn={onSignIn} />
+    </Route>
+    <Route path="/register">
+            <Register onSignUp={onSignUp} />
+    </Route>
+      <ProtectedRoute
+        path="/main"
+        loggedIn={loggedIn}
+        onEditProfile={handleEditProfileClick}
+        onAddPlace={handleAddPlaceClick}
+        onEditAvatar={handleEditAvatarClick}
+        cards={cards}
+        onCardClick={handleCardClick}
+        onCardLike={handleCardLike}
+        onCardDelete={handleDeleteCard}
+        component={Main}
+      />
+        <Route>
+            <Main
+              onEditProfile= {handleEditProfileClick}
+              onAddPlace = {handleAddPlaceClick}
+              onEditAvatar = {handleEditAvatarClick}
+              cards={cards}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleDeleteCard}
 
-        />
-        <EditAvatarPopup
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}
-          onUpdateAvatar={handleUpdateAvatar} >
-        </EditAvatarPopup>
-        <EditProfilePopup
-          isOpen={isEditProfilePopupOpen} 
-          onClose={closeAllPopups}
-          onUpdateUser={handleUpdateUser} >     
-        </EditProfilePopup>
-        <AddPlacePopup
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}
-          onAddPlace={handleAddPlaceSubmit}
-        >
-        </AddPlacePopup>
-        <ImagePopup onClose={closeAllPopups} card={selectedCard} isOpen={selectedCard.isOpen} />
-        <Footer />
-      </div>
+            />
+            <InfoToolTip></InfoToolTip>
+        </Route>
+        <Route exact path="/">
+            {loggedIn ? <Redirect to="/main" /> : <Redirect to="/login" />}
+        </Route>
+    </Switch>
+    <Footer />
+    <InfoToolTip
+    isOpen={isToolTipOpen}
+    onClose={closeAllPopups}
+    result={toolTipResult} />
+    <EditAvatarPopup
+    isOpen={isEditAvatarPopupOpen}
+    onClose={closeAllPopups}
+    onUpdateAvatar={handleUpdateAvatar} >
+    </EditAvatarPopup>
+    <EditProfilePopup
+    isOpen={isEditProfilePopupOpen} 
+    onClose={closeAllPopups}
+    onUpdateUser={handleUpdateUser} >     
+    </EditProfilePopup>
+    <AddPlacePopup
+    isOpen={isAddPlacePopupOpen}
+    onClose={closeAllPopups}
+    onAddPlace={handleAddPlaceSubmit}
+    >
+    </AddPlacePopup>
+    <ImagePopup onClose={closeAllPopups} card={selectedCard} isOpen={selectedCard.isOpen} />
     </div>
     </CurrentUserContext.Provider>
   );

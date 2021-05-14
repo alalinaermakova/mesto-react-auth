@@ -126,13 +126,63 @@ class Api {
         })
     }
 
+    signIn(data){
+        return fetch (`${this._baseUrl}/signin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                password: data.password,
+                email: data.email
+            })
+        })
+        .then(res => {
+            return this._getResponseData(res)
+        })
+    }
+
+    signUp(data){
+        return fetch(`${this._baseUrl}/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                password: data.password,
+                email: data.email
+            })
+        })
+        .then(res => {
+            return this._getResponseData(res)
+        })
+    }
+
+    isAuthorized() {
+        return fetch(`${this._baseUrl}/users/me`,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+    }
+    
+
 }
 
-const api = new Api({
+export const api = new Api({
     baseUrl: "https://mesto.nomoreparties.co/v1/cohort-19",
     headers: {
-        authorization: 'b473b6d5-1b9c-4d92-98e7-7dbd1658e995'
+        authorization: 'b473b6d5-1b9c-4d92-98e7-7dbd1658e995',
+        'Content-Type': 'application/json'
     }
 });
 
-export default api;
+export const authApi = new Api({
+    baseUrl: "https://auth.nomoreparties.co",
+    headers: {
+        'Content-Type': 'application/json'
+    },
+})
+
