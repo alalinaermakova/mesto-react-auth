@@ -25,4 +25,5 @@ Plans:
 * Loading indicators
 * Mobile version
 
-[Project](https://alalinaermakova.github.io/mesto-react-auth/)
+
+**[Project](https://alalinaermakova.github.io/mesto-react-auth/)**
