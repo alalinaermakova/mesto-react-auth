@@ -23,4 +23,6 @@ Plans:
 
 * Forms validation
 * Loading indicators
-* mobile version
+* Mobile version
+
+[Project](https://alalinaermakova.github.io/mesto-react-auth/)
